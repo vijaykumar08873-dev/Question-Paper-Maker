@@ -4,7 +4,7 @@ from PIL import Image
 from weasyprint import HTML
 
 # --- API KEY SETUP (Yahan apni key dalein) ---
-API_KEY = "Aapki_Gemini_API_Key_Yahan_Dalein" 
+API_KEY = "AIzaSyDSXDfUU3KaDGHWAydaajsBmxYCJv27kJA" 
 genai.configure(api_key=API_KEY)
 
 model = genai.GenerativeModel('gemini-1.5-flash')
