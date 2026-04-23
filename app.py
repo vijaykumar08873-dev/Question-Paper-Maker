@@ -6,23 +6,24 @@ from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
 
-# --- API KEY SETUP ---
-API_KEY = "AIzaSyDSXDfUU3KaDGHWAydaajsBmxYCJv27kJA" 
+# --- TIJORI (SECRETS) SE AUTOMATIC CHABI LENA ---
+try:
+    API_KEY = st.secrets["GEMINI_API_KEY"]
+except:
+    st.error("API Key nahi mili! Kripya Streamlit ki settings mein Secrets check karein.")
+    st.stop()
+
 client = genai.Client(api_key=API_KEY)
 
 def get_text_from_image(image):
+    # STRICT COMMAND: Jo photo mein hai wahi likho, apna dimaag mat lagao
     prompt = """
-    Extract all the questions and multiple-choice options from this exam paper image.
-    Keep the Hindi and English language exactly as it is.
-    Format it cleanly like a real test paper:
-    1. Question text here
-    (A) Option 1
-    (B) Option 2
-    (C) Option 3
-    (D) Option 4
-    Do NOT use any HTML tags, markdown, or special characters. Just pure plain text.
+    Extract the text from this exam paper image EXACTLY as it is written.
+    Do NOT answer the questions. Do NOT add any extra text, titles, comments, or explanations.
+    Keep the Hindi and English language exactly as it is in the image.
+    Format it cleanly line by line exactly like the original paper.
+    Do NOT use any HTML tags or markdown. Just pure plain text.
     """
-    # Yahan humne naya 'gemini-2.5-flash' model laga diya hai
     response = client.models.generate_content(
         model='gemini-2.5-flash',
         contents=[prompt, image]
@@ -39,11 +40,7 @@ def create_docx(all_text):
     cols.set(qn('w:num'), '2')
     cols.set(qn('w:space'), '720') # Columns ke beech ka space
     
-    # Title / Header
-    header = doc.add_heading('Geography Test Examination', level=1)
-    header.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    
-    # Har line ko properly word document mein daalna
+    # Har line ko properly word document mein daalna (Bina khud se kuch jode)
     for line in all_text.split('\n'):
         if line.strip():
             doc.add_paragraph(line.strip())
@@ -56,7 +53,7 @@ def create_docx(all_text):
 # --- UI SETUP ---
 st.set_page_config(page_title="Smart Question Paper Maker", page_icon="📝")
 st.title("📝 Auto Question Paper Generator")
-st.write("Apne phone ya computer se questions ki photos upload karein. Ye App automatically padhkar aapke liye ek **Editable Word File (2-Column)** bana dega!")
+st.write("Apne phone ya computer se questions ki photos upload karein. Ye App **exactly photo ka text padhkar** aapke liye ek Editable Word File bana dega!")
 
 uploaded_files = st.file_uploader("Upload Question Photos (Multiple allowed)", type=['png', 'jpg', 'jpeg'], accept_multiple_files=True)
 
